@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Index
+{% endblock %}
+
+{% block form %}{% endblock form %}
+
+{% block score %}User: {{ username }} &nbsp; &nbsp; Score: {{ score }}{% endblock score %}
+
+{% block content %}
+
+<div class="index-containers">
+    <div class="row">
+
+      <div class="col" style="padding: 30px; text-align: left">
+
+        <h3 style="text-align: center">Directions:</h3><br><br>
+
+        <h3>Select a difficulty level from the links above. <br><br>
+            Try to guess the city. Enter the city name above. <br><br>
+            For each correct city, you gain 100 points in normal mode, 200 points in difficult mode. <br><br>
+            You get three attempts for each city. <br><br>
+            After three attempts, you lose 50 points in normal mode, 100 points in difficult mode.<br><br></h3>
+      </div>
+
+      <div class="col">
+        <h3>Top Scores:</h3>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col" style="width:50%">Username</th>
+                    <th scope="col" style="width:50%">Score</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for row in topscores %}
+                    <tr>
+                        <td>{{ row["username"] }}</td>
+                        <td>{{ row["score"] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+      </div>
+    </div>
+
+{% endblock content %}

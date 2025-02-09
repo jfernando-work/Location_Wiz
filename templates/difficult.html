@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Difficult
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/difficult.js"></script>
+{% endblock scripts %}
+
+{% block form %}
+<form action="/difficult" class="d-flex" id="gameform" method="post">
+  <input type="hidden" autofocus name="scoretext" id="scoretext" placeholder="Score" value="">
+  <button class="btn btn-warning" type="submit" onclick="guesscity();">Guess</button> &nbsp;
+  <input class="form-control me-2" autofocus="autofocus" id="guess" name="city" type="text" placeholder="City Name">
+</form>
+{% endblock form %}
+
+{% block score %}User: {{ username }} &nbsp; &nbsp; Score: {{ score }} {% endblock score %}
+
+{% block content %}
+
+<div id="pano"></div>
+
+  <script src="https://maps.googleapis.com/maps/api/js?key= {{ maps_api_key }} &callback=initialize&v=weekly" defer></script>
+
+{% endblock content %}
