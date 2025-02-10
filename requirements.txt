@@ -27,6 +27,7 @@ docutils==0.16
 EditorConfig==0.12.3
 Flask==3.0.0
 Flask-Session==0.5.0
+Flask-SQLAlchemy
 fonttools==4.44.3
 greenlet==3.0.1
 gunicorn==23.0.0
