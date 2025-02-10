@@ -23,7 +23,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 maps_api_key = os.environ.get("MAPS_API_KEY")
-db = SQL("sqlite:///mapgame.db")
+db = "sqlite:///mapgame.db"
 
 
 @app.route("/", methods=["GET", "POST"])
