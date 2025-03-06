@@ -9,10 +9,7 @@ from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from helpers import login_required
 
-session_factory = sessionmaker(bind=db.engine)
-session = flask_scoped_session(session_factory, app)
-app.config["SESSION_TYPE"] = "sqlalchemy"
-app.config["SESSION_SQLALCHEMY"] = db
+
 
 # from dotenv import load_dotenv
 # load_dotenv()
@@ -21,14 +18,19 @@ app = Flask(__name__)
 
 #for sqlite db
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///mapgame.db"
-
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 
 db = SQLAlchemy(app)
 
+session_factory = sessionmaker(bind=db.engine)
+session = flask_scoped_session(session_factory, app)
+app.config["SESSION_TYPE"] = "sqlalchemy"
+app.config["SESSION_SQLALCHEMY"] = db
+
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
+
 Session(app)
 
 maps_api_key = os.environ.get("MAPS_API_KEY")
@@ -44,6 +46,8 @@ class User(db.Model):
     hashcode = db.Column(db.String(255), nullable=False)
     score = db.Column(db.Integer, default=0)
 
+with app.app_context():
+    db.create_all()
 
 @app.route("/", methods=["GET", "POST"])
 @login_required
@@ -51,9 +55,13 @@ def index():
 
     user_id = session["user_id"]
 
-    cur_score = db.session.execute("SELECT score FROM users WHERE id = ?", (user_id,)).fetchone()[0]
-    username = db.session.execute("SELECT username FROM users WHERE id = ?", (user_id,)).fetchone()[0]
-    topscores = db.session.execute("SELECT username, score FROM users ORDER BY score DESC LIMIT 10").fetchall()
+    cur_score = db.session.execute(text("SELECT score FROM users WHERE id = :id"), {"id": user_id}).fetchone()[0]
+
+
+    username = db.session.execute(text("SELECT username FROM users WHERE id = :id"), {"id": user_id}).fetchone()[0]
+
+    topscores = db.session.execute(text("SELECT username, score FROM users ORDER BY score DESC LIMIT 10")).fetchall()
+
 
     return render_template("index.html", username=username, score=cur_score, topscores=topscores)
 
@@ -86,17 +94,19 @@ def register():
             return render_template("register.html", error=error_msg)
 
         # Query database for username
-        rows = db.session.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchall()
+        rows = db.session.execute(text("SELECT * FROM users WHERE username = :username"), {"username": username}).fetchall()
 
         # Ensure username exists and password is correct
         if len(rows) != 0:
             error_msg = "User already exists."
             return render_template("register.html", error=error_msg)
         elif len(rows) == 0:
-            db.session.execute("INSERT INTO users (username, hashcode, score) VALUES(?, ?, ?)", (username, generate_password_hash(password), score))
+            db.session.execute(text("INSERT INTO users (username, hashcode, score) VALUES (:username, :hashcode, :score)"),
+                   {"username": username, "hashcode": generate_password_hash(password), "score": score})
             db.session.commit()
 
-        rows = db.session.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchall()
+        rows = db.session.execute(text("SELECT * FROM users WHERE username = :username"), {"username": username}).fetchall()
+
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
@@ -128,7 +138,8 @@ def login():
             return render_template("login.html", error=error_msg)
 
         # Query database for username
-        rows = db.session.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchall()
+        rows = db.session.execute(text("SELECT * FROM users WHERE username = :username"), {"username": username}).fetchall()
+
 
         # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["hashcode"], password):
@@ -163,8 +174,10 @@ def normal():
 
     user_id = session["user_id"]
 
-    cur_score = db.session.execute("SELECT score FROM users WHERE id = ?", (user_id,)).fetchone()[0]
-    username = db.session.execute("SELECT username FROM users WHERE id = ?", (user_id,)).fetchone()[0]
+    cur_score = db.session.execute(text("SELECT score FROM users WHERE id = :id"), {"id": user_id}).fetchone()[0]
+
+    username = db.session.execute(text("SELECT username FROM users WHERE id = :id"), {"id": user_id}).fetchone()[0]
+
 
     if request.method == "GET":
         return render_template("normal.html", username=username, score=cur_score, maps_api_key=maps_api_key)
@@ -176,7 +189,7 @@ def normal():
         if score <= 0:
             score = 0
 
-        db.session.execute("UPDATE users SET score = ? WHERE id = ?", (score, user_id))
+        db.session.execute(text("UPDATE users SET score = :score WHERE id = :id"), {"score": score, "id": user_id})
         db.session.commit()
 
         return render_template("normal.html", username=username, score=score, maps_api_key=maps_api_key)
@@ -188,8 +201,11 @@ def difficult():
 
     user_id = session["user_id"]
 
-    cur_score = db.session.execute("SELECT score FROM users WHERE id = ?", (user_id,)).fetchone()[0]
-    username = db.session.execute("SELECT username FROM users WHERE id = ?", (user_id,)).fetchone()[0]
+    cur_score = db.session.execute(text("SELECT score FROM users WHERE id = :id"), {"id": user_id}).fetchone()[0]
+
+
+    username = db.session.execute(text("SELECT username FROM users WHERE id = :id"), {"id": user_id}).fetchone()[0]
+
 
     if request.method == "GET":
         return render_template("difficult.html", username=username, score=cur_score, maps_api_key=maps_api_key)
@@ -201,7 +217,7 @@ def difficult():
         if score <= 0:
             score = 0
 
-        db.session.execute("UPDATE users SET score = ? WHERE id = ?", (score, user_id))
+        db.session.execute(text("UPDATE users SET score = :score WHERE id = :id"), {"score": score, "id": user_id})
         db.session.commit()
 
         return render_template("difficult.html", username=username, score=score, maps_api_key=maps_api_key)
