@@ -139,11 +139,11 @@ def login():
 
         # Ensure username exists and password is correct
             if len(rows) != 1 or not check_password_hash(rows[0]["hashcode"], password):
-            error_msg = "Incorrect password or username."
-            return render_template("login.html", error=error_msg)
-
+                error_msg = "Incorrect password or username."
+                return render_template("login.html", error=error_msg)
+            
         # Remember which user has logged in
-            session["user_id"] = rows[0]["id"]
+                session["user_id"] = rows[0]["id"]
 
         # Redirect user to home page
         return redirect("/")
