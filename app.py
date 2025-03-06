@@ -14,7 +14,12 @@ app = Flask(__name__)
 
 #for sqlite db
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///mapgame.db"
+
+if 'RENDER' in os.environ:
+    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///var/data/mapgame.db"
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db = SQLAlchemy(app)
 
 # Configure session to use filesystem (instead of signed cookies)
@@ -23,7 +28,13 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 maps_api_key = os.environ.get("MAPS_API_KEY")
-db = "sqlite:///mapgame.db"
+#db = "sqlite:///mapgame.db"
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    hashcode = db.Column(db.String(255), nullable=False)
+    score = db.Column(db.Integer, default=0)
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -31,10 +42,10 @@ db = "sqlite:///mapgame.db"
 def index():
 
     user_id = session["user_id"]
-    cur_score = db.execute("SELECT score FROM users WHERE id = ?", user_id)[0]["score"]
-    username = db.execute("SELECT username FROM users WHERE id = ?", user_id)[0]["username"]
 
-    topscores = db.execute("SELECT username, score FROM users ORDER BY score DESC LIMIT 10")
+    cur_score = db.session.execute("SELECT score FROM users WHERE id = ?", (user_id,)).fetchone()[0]
+    username = db.session.execute("SELECT username FROM users WHERE id = ?", (user_id,)).fetchone()[0]
+    topscores = db.session.execute("SELECT username, score FROM users ORDER BY score DESC LIMIT 10").fetchall()
 
     return render_template("index.html", username=username, score=cur_score, topscores=topscores)
 
@@ -67,16 +78,17 @@ def register():
             return render_template("register.html", error=error_msg)
 
         # Query database for username
-        rows = db.execute("SELECT * FROM users WHERE username = ?", username)
+        rows = db.session.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchall()
 
         # Ensure username exists and password is correct
         if len(rows) != 0:
             error_msg = "User already exists."
             return render_template("register.html", error=error_msg)
         elif len(rows) == 0:
-            db.execute("INSERT INTO users (username, hashcode, score) VALUES(?, ?, ?)", username, generate_password_hash(password), score)
+            db.session.execute("INSERT INTO users (username, hashcode, score) VALUES(?, ?, ?)", (username, generate_password_hash(password), score))
+            db.session.commit()
 
-        rows = db.execute("SELECT * FROM users WHERE username = ?", username)
+        rows = db.session.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchall()
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
@@ -108,7 +120,7 @@ def login():
             return render_template("login.html", error=error_msg)
 
         # Query database for username
-        rows = db.execute("SELECT * FROM users WHERE username = ?", username)
+        rows = db.session.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchall()
 
         # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["hashcode"], password):
@@ -142,8 +154,9 @@ def logout():
 def normal():
 
     user_id = session["user_id"]
-    cur_score = db.execute("SELECT score FROM users WHERE id = ?", user_id)[0]["score"]
-    username = db.execute("SELECT username FROM users WHERE id = ?", user_id)[0]["username"]
+
+    cur_score = db.session.execute("SELECT score FROM users WHERE id = ?", (user_id,)).fetchone()[0]
+    username = db.session.execute("SELECT username FROM users WHERE id = ?", (user_id,)).fetchone()[0]
 
     if request.method == "GET":
         return render_template("normal.html", username=username, score=cur_score, maps_api_key=maps_api_key)
@@ -155,7 +168,9 @@ def normal():
         if score <= 0:
             score = 0
 
-        db.execute("UPDATE users SET score = ? WHERE id = ?", score, user_id)
+        db.session.execute("UPDATE users SET score = ? WHERE id = ?", (score, user_id))
+        db.session.commit()
+
         return render_template("normal.html", username=username, score=score, maps_api_key=maps_api_key)
 
 
@@ -164,8 +179,9 @@ def normal():
 def difficult():
 
     user_id = session["user_id"]
-    cur_score = db.execute("SELECT score FROM users WHERE id = ?", user_id)[0]["score"]
-    username = db.execute("SELECT username FROM users WHERE id = ?", user_id)[0]["username"]
+
+    cur_score = db.session.execute("SELECT score FROM users WHERE id = ?", (user_id,)).fetchone()[0]
+    username = db.session.execute("SELECT username FROM users WHERE id = ?", (user_id,)).fetchone()[0]
 
     if request.method == "GET":
         return render_template("difficult.html", username=username, score=cur_score, maps_api_key=maps_api_key)
@@ -177,5 +193,7 @@ def difficult():
         if score <= 0:
             score = 0
 
-        db.execute("UPDATE users SET score = ? WHERE id = ?", score, user_id)
+        db.session.execute("UPDATE users SET score = ? WHERE id = ?", (score, user_id))
+        db.session.commit()
+
         return render_template("difficult.html", username=username, score=score, maps_api_key=maps_api_key)
