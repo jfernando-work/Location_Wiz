@@ -3,9 +3,17 @@ import os
 #from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
+from flask_sqlalchemy_session import flask_scoped_session
+from sqlalchemy.orm import scoped_session, sessionmaker
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from helpers import login_required
+
+session_factory = sessionmaker(bind=db.engine)
+session = flask_scoped_session(session_factory, app)
+app.config["SESSION_TYPE"] = "sqlalchemy"
+app.config["SESSION_SQLALCHEMY"] = db
 
 # from dotenv import load_dotenv
 # load_dotenv()
@@ -25,6 +33,10 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 maps_api_key = os.environ.get("MAPS_API_KEY")
+
+if maps_api_key is None:
+    raise ValueError("Missing MAPS_API_KEY. Make sure to set it in the environment variables.")
+
 #db = "sqlite:///mapgame.db"
 
 class User(db.Model):
