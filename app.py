@@ -4,8 +4,7 @@ import os
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
-from flask_sqlalchemy_session import flask_scoped_session
-from sqlalchemy.orm import scoped_session, sessionmaker
+
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from helpers import login_required
