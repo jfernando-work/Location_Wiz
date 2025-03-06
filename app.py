@@ -2,6 +2,7 @@ import os
 
 #from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session
+from sqlalchemy.orm import sessionmaker, scoped_session
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 
@@ -24,7 +25,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 session_factory = sessionmaker(bind=db.engine)
-session = flask_scoped_session(session_factory, app)
+session = scoped_session(session_factory)
+
 app.config["SESSION_TYPE"] = "sqlalchemy"
 app.config["SESSION_SQLALCHEMY"] = db
 
