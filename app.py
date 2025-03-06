@@ -13,7 +13,7 @@ from helpers import login_required
 app = Flask(__name__)
 
 #for sqlite db
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mapgame.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///mapgame.db"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
