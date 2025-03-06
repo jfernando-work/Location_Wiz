@@ -1,44 +1,36 @@
 import os
-
-#from cs50 import SQL
 from flask import Flask, flash, redirect, render_template, request, session
-from sqlalchemy.orm import sessionmaker, scoped_session
+
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
+from config import Config
 
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from helpers import login_required
 
-# from dotenv import load_dotenv
-# load_dotenv()
+
 
 app = Flask(__name__)
 
-#for sqlite db
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:////var/data/mapgame.db"
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL").replace("postgres://", "postgresql://", 1)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-session_factory = sessionmaker(bind=db.engine)
-session = scoped_session(session_factory)
 app.config["SESSION_TYPE"] = "sqlalchemy"
+app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_SQLALCHEMY"] = db
 
-app.config["SESSION_TYPE"] = "filesystem"
 
-# Configure session to use filesystem (instead of signed cookies)
-app.config["SESSION_PERMANENT"] = False
 
 Session(app)
 
-maps_api_key = os.environ.get("MAPS_API_KEY")
 
-if maps_api_key is None:
-    raise ValueError("Missing MAPS_API_KEY. Make sure to set it in the environment variables.")
 
-#db = "sqlite:///mapgame.db"
+maps_api_key = os.environ.get("MAPS_API_KEY", "")
+if not maps_api_key:
+    print("Warning: MAPS_API_KEY is not set.")
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -46,7 +38,8 @@ class User(db.Model):
     hashcode = db.Column(db.String(255), nullable=False)
     score = db.Column(db.Integer, default=0)
 
-db.create_all()
+with app.app_context():
+    db.create_all()
 
 @app.route("/", methods=["GET", "POST"])
 @login_required
