@@ -26,6 +26,8 @@ session = scoped_session(session_factory)
 app.config["SESSION_TYPE"] = "sqlalchemy"
 app.config["SESSION_SQLALCHEMY"] = db
 
+app.config["SESSION_TYPE"] = "filesystem"
+
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False
 
@@ -44,8 +46,7 @@ class User(db.Model):
     hashcode = db.Column(db.String(255), nullable=False)
     score = db.Column(db.Integer, default=0)
 
-with app.app_context():
-    db.create_all()
+db.create_all()
 
 @app.route("/", methods=["GET", "POST"])
 @login_required
@@ -210,4 +211,4 @@ def difficult():
         db.session.execute(text("UPDATE users SET score = :score WHERE id = :id"), {"score": score, "id": user_id})
         db.session.commit()
 
-    return render_template("difficult.html", username=username, score=score, maps_api_key=maps_api_key)
+        return render_template("difficult.html", username=username, score=score, maps_api_key=maps_api_key)
