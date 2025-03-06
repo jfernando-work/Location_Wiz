@@ -10,7 +10,6 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from helpers import login_required
 
 
-
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL").replace("postgres://", "postgresql://", 1)
@@ -22,11 +21,7 @@ app.config["SESSION_TYPE"] = "sqlalchemy"
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_SQLALCHEMY"] = db
 
-
-
 Session(app)
-
-
 
 maps_api_key = os.environ.get("MAPS_API_KEY", "")
 if not maps_api_key:
@@ -40,6 +35,7 @@ class User(db.Model):
 
 with app.app_context():
     db.create_all()
+
 
 @app.route("/", methods=["GET", "POST"])
 @login_required
