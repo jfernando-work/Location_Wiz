@@ -36,6 +36,8 @@ class User(db.Model):
     hashcode = db.Column(db.String(255), nullable=False)
     score = db.Column(db.Integer, default=0)
 
+with app.app_context():
+    db.create_all()
 
 @app.route("/", methods=["GET", "POST"])
 @login_required
