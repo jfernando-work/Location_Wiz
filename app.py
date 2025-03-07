@@ -12,7 +12,7 @@ app = Flask(__name__)
 
 db_url = os.getenv("DATABASE_URL")
 if db_url:
-    app.config['SQLALCHEMY_DATABASE_URI'] = db_url.replace("postgres://", "postgresql://", 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_url.replace("postgres://", "postgresql://", "?sslmode=require", 1)
 else:
     raise ValueError("DATABASE_URL is not set")
 
