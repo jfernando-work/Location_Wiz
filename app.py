@@ -1,10 +1,8 @@
 import os
 from flask import Flask, flash, redirect, render_template, request, session
-
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 #from config import Config
-
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from helpers import login_required
@@ -49,9 +47,17 @@ def index():
     
     user_id = session["user_id"]
 
-    cur_score = db.session.execute(text("SELECT score FROM users WHERE id = :id"), {"id": user_id}).fetchone()[0]
-    username = db.session.execute(text("SELECT username FROM users WHERE id = :id"), {"id": user_id}).fetchone()[0]
-    topscores = db.session.execute(text("SELECT username, score FROM users ORDER BY score DESC LIMIT 10")).fetchall()
+    cur_score = db.session.execute(
+        text("SELECT score FROM users WHERE id = :id"), {"id": user_id}
+    ).scalar() or 0
+
+    username = db.session.execute(
+        text("SELECT username FROM users WHERE id = :id"), {"id": user_id}
+    ).scalar() or "Unknown"
+
+    topscores = db.session.execute(
+        text("SELECT username, score FROM users ORDER BY score DESC LIMIT 10")
+    ).fetchall()
 
     return render_template("index.html", username=username, score=cur_score, topscores=topscores)
 
@@ -85,16 +91,22 @@ def register():
 
         
         # Query database for username
-        rows = db.session.execute(text("SELECT * FROM users WHERE username = :username"), {"username": username}).fetchall()
+        existing_user = db.session.execute(
+            text("SELECT * FROM users WHERE username = :username"), 
+                {"username": username}
+            ).fetchone()
 
         # Ensure username exists and password is correct
-        if len(rows) != 0:
+        if existing_user:
             error_msg = "User already exists."
             return render_template("register.html", error=error_msg)
-        elif len(rows) == 0:
-            db.session.execute(text("INSERT INTO users (username, hashcode, score) VALUES (:username, :hashcode, :score)"),
-                {"username": username, "hashcode": generate_password_hash(password), "score": score})
-            db.session.commit()
+        
+        db.session.execute(
+            text("INSERT INTO users (username, hashcode, score) VALUES (:username, :hashcode, :score)"),
+            {"username": username, "hashcode": generate_password_hash(password), "score": score}
+        )
+        db.session.commit()
+
 
         rows = db.session.execute(text("SELECT * FROM users WHERE username = :username"), {"username": username}).fetchall()
 
@@ -129,7 +141,10 @@ def login():
 
         # Query database for username
         
-        rows = db.session.execute(text("SELECT * FROM users WHERE username = :username"), {"username": username}).fetchall()
+        existing_user = db.session.execute(
+            text("SELECT * FROM users WHERE username = :username"), 
+                {"username": username}
+            ).fetchone()
 
         # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["hashcode"], password):
@@ -164,8 +179,13 @@ def normal():
 
     user_id = session["user_id"]
     
-    cur_score = db.session.execute(text("SELECT score FROM users WHERE id = :id"), {"id": user_id}).fetchone()[0]
-    username = db.session.execute(text("SELECT username FROM users WHERE id = :id"), {"id": user_id}).fetchone()[0]
+    cur_score = db.session.execute(
+        text("SELECT score FROM users WHERE id = :id"), {"id": user_id}
+    ).scalar() or 0
+
+    username = db.session.execute(
+        text("SELECT username FROM users WHERE id = :id"), {"id": user_id}
+    ).scalar() or "Unknown"
 
     if request.method == "GET":
         return render_template("normal.html", username=username, score=cur_score, maps_api_key=maps_api_key)
@@ -178,8 +198,11 @@ def normal():
             score = 0
 
         
-        db.session.execute(text("UPDATE users SET score = :score WHERE id = :id"), {"score": score, "id": user_id})
-        db.session.commit()
+    db.session.execute(
+        text("UPDATE users SET score = :score WHERE id = :id"),
+        {"score": new_total_score, "id": user_id}
+    )
+    db.session.commit()
 
     return render_template("normal.html", username=username, score=score, maps_api_key=maps_api_key)
 
@@ -190,8 +213,13 @@ def difficult():
 
     user_id = session["user_id"]
     
-    cur_score = db.session.execute(text("SELECT score FROM users WHERE id = :id"), {"id": user_id}).fetchone()[0]
-    username = db.session.execute(text("SELECT username FROM users WHERE id = :id"), {"id": user_id}).fetchone()[0]
+    cur_score = db.session.execute(
+        text("SELECT score FROM users WHERE id = :id"), {"id": user_id}
+    ).scalar() or 0
+
+    username = db.session.execute(
+        text("SELECT username FROM users WHERE id = :id"), {"id": user_id}
+    ).scalar() or "Unknown"
 
     if request.method == "GET":
         return render_template("difficult.html", username=username, score=cur_score, maps_api_key=maps_api_key)
@@ -203,7 +231,10 @@ def difficult():
         if score <= 0:
             score = 0
         
-        db.session.execute(text("UPDATE users SET score = :score WHERE id = :id"), {"score": score, "id": user_id})
-        db.session.commit()
+    db.session.execute(
+        text("UPDATE users SET score = :score WHERE id = :id"),
+        {"score": new_total_score, "id": user_id}
+    )
+    db.session.commit()
 
-        return render_template("difficult.html", username=username, score=score, maps_api_key=maps_api_key)
+    return render_template("difficult.html", username=username, score=score, maps_api_key=maps_api_key)
