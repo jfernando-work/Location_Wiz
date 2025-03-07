@@ -12,7 +12,12 @@ from helpers import login_required
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL").replace("postgres://", "postgresql://", 1)
+db_url = os.getenv("DATABASE_URL")
+if db_url:
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_url.replace("postgres://", "postgresql://", 1)
+else:
+    raise ValueError("DATABASE_URL is not set")
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -35,6 +40,7 @@ class User(db.Model):
 
 with app.app_context():
     db.create_all()
+    db.session.commit()
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -42,6 +48,7 @@ with app.app_context():
 def index():
     
     user_id = session["user_id"]
+        return redirect("/login")
 
     cur_score = db.session.execute(text("SELECT score FROM users WHERE id = :id"), {"id": user_id}).fetchone()[0]
     username = db.session.execute(text("SELECT username FROM users WHERE id = :id"), {"id": user_id}).fetchone()[0]
