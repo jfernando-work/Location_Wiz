@@ -108,10 +108,13 @@ def register():
         db.session.commit()
 
 
-        rows = db.session.execute(text("SELECT * FROM users WHERE username = :username"), {"username": username}).fetchall()
+        existing_user = db.session.execute(
+            text("SELECT * FROM users WHERE username = :username"), {"username": username}
+        ).fetchone()
 
         # Remember which user has logged in
-        session["user_id"] = rows[0]["id"]
+        session["user_id"] = new_user.id
+        db.session.commit()
 
         # Redirect user to home page
         return redirect("/")
@@ -152,7 +155,8 @@ def login():
             return render_template("login.html", error=error_msg)
             
         # Remember which user has logged in
-        session["user_id"] = rows[0]["id"]
+        session["user_id"] = new_user.id
+        db.session.commit()
 
         # Redirect user to home page
         return redirect("/")
