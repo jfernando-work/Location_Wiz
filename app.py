@@ -7,7 +7,6 @@ from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from helpers import login_required
 
-
 app = Flask(__name__)
 
 db_url = os.getenv("DATABASE_URL")
@@ -113,7 +112,7 @@ def register():
 
         # Remember which user has logged in
         session["user_id"] = new_user.id
-        db.session.commit()
+       
 
         # Redirect user to home page
         return redirect("/")
