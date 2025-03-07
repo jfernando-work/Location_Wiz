@@ -30,7 +30,7 @@ maps_api_key = os.environ.get("MAPS_API_KEY", "")
 if not maps_api_key:
     print("Warning: MAPS_API_KEY is not set.")
 
-class User(db.Model):
+class users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     hashcode = db.Column(db.String(255), nullable=False)
