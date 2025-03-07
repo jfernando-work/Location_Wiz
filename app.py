@@ -31,7 +31,7 @@ if not maps_api_key:
     print("Warning: MAPS_API_KEY is not set.")
 
 class users(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     hashcode = db.Column(db.String(255), nullable=False)
     score = db.Column(db.Integer, default=0)
