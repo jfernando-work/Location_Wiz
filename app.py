@@ -23,6 +23,7 @@ db = SQLAlchemy(app)
 app.config["SESSION_TYPE"] = "sqlalchemy"
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_SQLALCHEMY"] = db
+app.config["SESSION_SQLALCHEMY_TABLE"] = "sessions"
 
 Session(app)
 
@@ -103,8 +104,10 @@ def register():
         
         new_user = db.session.execute(
             text("INSERT INTO users (username, hashcode, score) VALUES (:username, :hashcode, 0) RETURNING id"),
-            {"username": username, "hashcode": generate_password_hash(password)}
+        {"username": username, "hashcode": generate_password_hash(password)}
         ).fetchone()
+
+        session["user_id"] = new_user[0]
 
         db.session.commit()
 
@@ -188,17 +191,19 @@ def normal():
         return render_template("normal.html", username=username, score=cur_score, maps_api_key=maps_api_key)
 
     else:
-        new_score = int(request.form.get("scoretext"))
-        score = cur_score + new_score
-
-    score = max(0, cur_score + new_score)
+        try:
+            new_score = int(request.form.get("scoretext", 0))
+        except ValueError:
+            return render_template("normal.html", username=username, score=cur_score, error="Invalid score input.")
+        
+        score = max(0, cur_score + new_score)
 
         
-    db.session.execute(
-        text("UPDATE users SET score = :score WHERE id = :id"),
-        {"score": score, "id": user_id}
-    )
-    db.session.commit()
+        db.session.execute(
+            text("UPDATE users SET score = :score WHERE id = :id"),
+            {"score": score, "id": user_id}
+        )
+        db.session.commit()
 
     return render_template("normal.html", username=username, score=score, maps_api_key=maps_api_key)
 
@@ -221,16 +226,18 @@ def difficult():
         return render_template("difficult.html", username=username, score=cur_score, maps_api_key=maps_api_key)
 
     else:
-        new_score = int(request.form.get("scoretext"))
-        score = cur_score + new_score
-
-        if score <= 0:
-            score = 0
+        try:
+            new_score = int(request.form.get("scoretext", 0))
+        except ValueError:
+            return render_template("difficult.html", username=username, score=cur_score, error="Invalid score input.")
         
-    db.session.execute(
-        text("UPDATE users SET score = :score WHERE id = :id"),
-        {"score": score, "id": user_id}
-    )
-    db.session.commit()
+        score = max(0, cur_score + new_score)
+
+        
+        db.session.execute(
+            text("UPDATE users SET score = :score WHERE id = :id"),
+            {"score": score, "id": user_id}
+        )
+        db.session.commit()
 
     return render_template("difficult.html", username=username, score=score, maps_api_key=maps_api_key)
