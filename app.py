@@ -101,16 +101,12 @@ def register():
             error_msg = "User already exists."
             return render_template("register.html", error=error_msg)
         
-        db.session.execute(
-            text("INSERT INTO users (username, hashcode, score) VALUES (:username, :hashcode, :score)"),
-            {"username": username, "hashcode": generate_password_hash(password), "score": score}
-        )
-        db.session.commit()
-
-
-        existing_user = db.session.execute(
-            text("SELECT * FROM users WHERE username = :username"), {"username": username}
+        new_user = db.session.execute(
+            text("INSERT INTO users (username, hashcode, score) VALUES (:username, :hashcode, 0) RETURNING id"),
+            {"username": username, "hashcode": generate_password_hash(password)}
         ).fetchone()
+
+        db.session.commit()
 
         # Remember which user has logged in
         session["user_id"] = new_user.id
@@ -133,32 +129,29 @@ def login():
         password = request.form.get("password")
 
         # Ensure username was submitted
-        if username == "":
+        if not username:
             error_msg = "Enter a valid username."
             return render_template("login.html", error=error_msg)
 
         # Ensure password was submitted
-        elif password == "":
+        elif not password:
             error_msg = "Enter a valid password."
             return render_template("login.html", error=error_msg)
 
-        # Query database for username
-        
+        # Query database for user
         existing_user = db.session.execute(
-            text("SELECT * FROM users WHERE username = :username"), 
-                {"username": username}
-            ).fetchone()
+            text("SELECT id, hashcode FROM users WHERE username = :username"),
+            {"username": username}
+        ).fetchone()
 
-        # Ensure username exists and password is correct
-        if len(rows) != 1 or not check_password_hash(rows[0]["hashcode"], password):
-            error_msg = "Incorrect password or username."
-            return render_template("login.html", error=error_msg)
-            
+        # Ensure user exists and password is correct
+        if not existing_user or not check_password_hash(existing_user.hashcode, password):
+            return render_template("login.html", error="Incorrect username or password.")
+
         # Remember which user has logged in
-        session["user_id"] = new_user.id
-        db.session.commit()
+        session["user_id"] = existing_user.id
 
-        # Redirect user to home page
+        # Redirect to homepage
         return redirect("/")
 
     # User reached route via GET (as by clicking a link or via redirect)
@@ -198,13 +191,12 @@ def normal():
         new_score = int(request.form.get("scoretext"))
         score = cur_score + new_score
 
-        if score <= 0:
-            score = 0
+    score = max(0, cur_score + new_score)
 
         
     db.session.execute(
         text("UPDATE users SET score = :score WHERE id = :id"),
-        {"score": new_total_score, "id": user_id}
+        {"score": score, "id": user_id}
     )
     db.session.commit()
 
@@ -237,7 +229,7 @@ def difficult():
         
     db.session.execute(
         text("UPDATE users SET score = :score WHERE id = :id"),
-        {"score": new_total_score, "id": user_id}
+        {"score": score, "id": user_id}
     )
     db.session.commit()
 
