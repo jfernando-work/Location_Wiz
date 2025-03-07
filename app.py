@@ -100,7 +100,7 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        session["user_id"] = new_user[0]
+        session["user_id"] = new_user.id
 
         db.session.commit()
 
