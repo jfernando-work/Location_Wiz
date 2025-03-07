@@ -48,7 +48,6 @@ with app.app_context():
 def index():
     
     user_id = session["user_id"]
-        return redirect("/login")
 
     cur_score = db.session.execute(text("SELECT score FROM users WHERE id = :id"), {"id": user_id}).fetchone()[0]
     username = db.session.execute(text("SELECT username FROM users WHERE id = :id"), {"id": user_id}).fetchone()[0]
