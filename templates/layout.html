@@ -20,7 +20,10 @@
 
             <nav class="navbar navbar-expand-lg bg-light">
                 <div class="container-fluid">
-                  <a class="navbar-brand" href="/">L O C A T I O N W I Z</a>
+
+                  <a class="navbar-brand" href="/">
+                    <img src="{{ url_for('static', filename='images/locationwiz_logo.png') }}" alt="LocationWiz Logo" height="40" class="d-inline-block align-top">
+                  </a>
 
                   {% if session["user_id"] %}
                   <div class="collapse navbar-collapse" id="navbarSupportedContent">
