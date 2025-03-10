@@ -1,5 +1,5 @@
 
-var locations = [
+/* var locations = [
   [ { lat: 24.4736151524367, lng: 54.6015447358361 }, {city: 'Abu Dhabi'} ],
   [ { lat: 31.2181876235367, lng: 29.9261655414436 }, {city: 'Alexandria'} ],
   [ { lat: 52.3729781128996, lng: 4.90191049691144 }, {city: 'Amsterdam'} ],
@@ -138,7 +138,22 @@ var locations = [
   [ { lat: 28.6122232641569, lng: 77.209 }, {city: 'New Delhi'} ],
   [ { lat: -37.8148902174556, lng: 144.9631 }, {city: 'Melbourne'} ],
   [ { lat: -33.4484077623257, lng: -70.6693 }, {city: 'Santiago'} ]
-]
+] */
+
+ 
+
+async function fetchLocations() {
+  try {
+      const response = await fetch('http://glazed.onrender.com/locations');
+      const locations = await response.json();
+
+  } catch (error) {
+      console.error("Error fetching locations:", error);
+  }
+}
+
+var locations = fetchLocations();
+
 
 curLocation = locations[Math.floor(Math.random()*(locations.length))]
 
