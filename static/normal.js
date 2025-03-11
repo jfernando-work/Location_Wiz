@@ -143,16 +143,21 @@
  
 
 async function fetchLocations() {
-  try {
-      const response = await fetch('http://glazed.onrender.com/locations');
-      const locations = await response.json();
-
-  } catch (error) {
-      console.error("Error fetching locations:", error);
-  }
+    try {
+        const response = await fetch('http://glazed.onrender.com/locations');
+        return await response.json();
+    } catch (error) {
+        console.error("Error fetching locations:", error);
+        return []; // Return an empty array in case of failure
+    }
 }
 
-var locations = fetchLocations();
+var locations = await fetchLocations();
+
+if (locations.length === 0) {
+  console.error("No locations received.");
+  return;
+}
 
 
 curLocation = locations[Math.floor(Math.random()*(locations.length))]
