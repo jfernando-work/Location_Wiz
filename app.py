@@ -40,7 +40,6 @@ with app.app_context():
     db.create_all()
     db.session.commit()
 
-
 @app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
