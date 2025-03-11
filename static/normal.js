@@ -1,5 +1,5 @@
 var locations = [
-  [ { lat: 24.4736151524367, lng: 54.6015447358361 }, {city: 'Abu Dhabi'} ],
+  [ { lat: 24.4736151524367, lng: 54.6015447358361 }, {city: 'Abu Dhabis'} ],
   [ { lat: 31.2181876235367, lng: 29.9261655414436 }, {city: 'Alexandria'} ],
   [ { lat: 52.3729781128996, lng: 4.90191049691144 }, {city: 'Amsterdam'} ],
   [ { lat: 61.214343463232, lng: -149.899619373681 }, {city: 'Anchorage'} ],
