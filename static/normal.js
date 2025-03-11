@@ -8,15 +8,22 @@ async function fetchLocations() {
         console.error("Error fetching locations:", error);
         return []; // Return an empty array in case of failure
     }
+}
 
-    var locations = await fetchLocations();
+let locations = [];
 
+async function loadLocations() {
+    locations = await fetchLocations();
+    
     if (locations.length === 0) {
         console.error("No locations received.");
-    return;
+        return;
     }
 
+    initializeGame(locations);
 }
+
+loadLocations();
 
 
 curLocation = locations[Math.floor(Math.random()*(locations.length))]
