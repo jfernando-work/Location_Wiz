@@ -21,15 +21,16 @@ async function loadLocations() {
     }
 
     initializeGame(locations);
+
+  curLocation = locations[Math.floor(Math.random()*(locations.length))]
+  curCoordinates = curLocation[0]
+  curCity = curLocation[1].city
 }
 
 loadLocations();
 
 
-curLocation = locations[Math.floor(Math.random()*(locations.length))]
 
-curCoordinates = curLocation[0]
-curCity = curLocation[1].city
 
 let score = 0;
 var failCounter = 0;
