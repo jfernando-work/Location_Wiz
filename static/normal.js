@@ -8,13 +8,14 @@ async function fetchLocations() {
         console.error("Error fetching locations:", error);
         return []; // Return an empty array in case of failure
     }
-}
 
-var locations = await fetchLocations();
+    var locations = await fetchLocations();
 
-if (locations.length === 0) {
-  console.error("No locations received.");
-  return;
+    if (locations.length === 0) {
+        console.error("No locations received.");
+    return;
+    }
+
 }
 
 
