@@ -1,12 +1,9 @@
 import os
 from flask import Flask, flash, redirect, render_template, request, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import text
-#from config import Config
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from helpers import login_required
-import psycopg2
 
 app = Flask(__name__)
 
@@ -40,21 +37,6 @@ class users(db.Model):
 with app.app_context():
     db.create_all()
     db.session.commit()
-
-
-class locations(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
-    city = db.Column(db.String(100), nullable=False)
-    lat = db.Column(db.Float, nullable=False)
-    lng = db.Column(db.Float, nullable=False)
-    level = db.Column(db.String(100), nullable=False)
-
-
-@app.route("/locations", methods=["GET"])
-def get_locations():
-    locations = locations.query.all()  # Fetch all locations from the database
-    locations_data = [{"name": loc.city, "latitude": loc.lat, "longitude": loc.lng, "level": loc.level} for loc in locations]
-    return jsonify(locations_data)
 
 
 @app.route("/", methods=["GET", "POST"])
