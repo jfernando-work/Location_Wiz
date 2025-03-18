@@ -19,13 +19,12 @@ async function fetchData() {
     return dataArray;
   } catch (err) {
     console.error('Error executing query', err);
-  } finally {
-    client.end(); // Close connection
-  }
+  } 
 }
+process.on("exit", () => client.end()); // Close only on exit
 
 // Call the function
-fetchData();
+dataArray = await fetchData();
 
 const locations = dataArray;
 curLocation = locations[Math.floor(Math.random()*(locations.length))]
