@@ -24,7 +24,7 @@ async function fetchData() {
 process.on("exit", () => client.end()); // Close only on exit
 
 // Call the function
-dataArray = await fetchData();
+dataArray = fetchData();
 
 const locations = dataArray;
 curLocation = locations[Math.floor(Math.random()*(locations.length))]
