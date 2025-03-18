@@ -8,8 +8,12 @@ const client = new Client({
   password: process.env.LOCATION_KEY,
   port: 5432, // Default PostgreSQL port
 });
-
 client.connect();
+
+client.connect()
+  .then(() => console.log('✅ Connected to PostgreSQL successfully!'))
+  .catch(err => console.error('❌ Connection error:', err.stack))
+  .finally(() => client.end()); // Close connection after test
 
 async function fetchData() {
   try {
