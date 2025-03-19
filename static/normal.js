@@ -1,12 +1,23 @@
 
 let locations = [];
+let usedCities = new Set(); 
 
 fetch('/normal_locations')
     .then(response => response.json())
     .then(data => {
         locations = data;
+
+        if (usedCities.size === locations.length) {
+          usedCities.clear();
+        }
+
+        // Filter out used cities
+        let remainingCities = locations.filter(location => !usedCities.has(location));
+        if (remainingCities.length === 0) return;
+
         // Now you can use the locations array as before
-        curLocation = locations[Math.floor(Math.random() * locations.length)];
+        curLocation = remainingCities[Math.floor(Math.random() * remainingCities.length)];
+        usedCities.add(curLocation.id);
         curCoordinates = curLocation;
         curCity = curLocation.city;
         initialize(); // Initialize Street View after data is loaded
