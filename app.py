@@ -31,8 +31,8 @@ if not maps_api_key:
 class Location(db.Model):
     __tablename__ = 'locations'
     id = db.Column(db.Integer, primary_key=True)
-    latitude = db.Column(db.Float, nullable=False)
-    longitude = db.Column(db.Float, nullable=False)
+    lat = db.Column(db.Float, nullable=False)
+    lng = db.Column(db.Float, nullable=False)
     city = db.Column(db.String(255), nullable=False)
 
 class users(db.Model):
@@ -48,7 +48,7 @@ with app.app_context():
 @app.route('/locations', methods=['GET'])
 def get_locations():
     locations = Location.query.all()
-    locations_list = [{"lat": loc.latitude, "lng": loc.longitude, "city": loc.city} for loc in locations]
+    locations_list = [{"lat": loc.lat, "lng": loc.lng, "city": loc.city} for loc in locations]
     return jsonify(locations_list)
 
 if __name__ == '__main__':
