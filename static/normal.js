@@ -1,6 +1,7 @@
 
 let locations = [];
-let usedCities = new Set(); 
+let usedCities = new Set();
+let curLocation, curCity, curCoordinates;
 
 fetch('/normal_locations')
     .then(response => response.json())
@@ -40,26 +41,26 @@ function closeModal() {
   modal.style.display = "none";
 }
 
-function increaseScore() {
+function increaseScore(event) {
   score = 100;
   document.getElementById("scoretext").value = score;
   document.getElementById("gameform").submit();
   event.preventDefault()
 }
 
-function decreaseScore() {
+function decreaseScore(event) {
   score = -50;
   document.getElementById("scoretext").value = score;
   document.getElementById("gameform").submit();
   event.preventDefault()
 }
 
-function resetForm() {
+function resetForm(event) {
   document.getElementById("guess").value = "";
   event.preventDefault()
 }
 
-function guesscity() {
+function guesscity(event) {
   guess = document.getElementById("guess").value;
   closeModalButton = document.getElementById("closeModal");
 
