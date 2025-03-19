@@ -12,7 +12,7 @@ fetch('/normal_locations')
         }
 
         // Filter out used cities
-        let remainingCities = locations.filter(location.id => !usedCities.has(location.id));
+        let remainingCities = locations.filter(location => !usedCities.has(location.id));
         if (remainingCities.length === 0) return;
 
         // Now you can use the locations array as before
