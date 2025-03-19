@@ -34,6 +34,7 @@ class Location(db.Model):
     lat = db.Column(db.Double, nullable=False)
     lng = db.Column(db.Double, nullable=False)
     city = db.Column(db.String(255), nullable=False)
+    level = db.Column(db.String(255), nullable=False)
 
 class users(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
@@ -45,11 +46,14 @@ with app.app_context():
     db.create_all()
     db.session.commit()
 
-@app.route('/locations', methods=['GET'])
-def get_locations():
-    locations = Location.query.all()
-    locations_list = [{"lat": loc.lat, "lng": loc.lng, "city": loc.city} for loc in locations]
-    return jsonify(locations_list)
+@app.route('/normal_locations', methods=['GET'])
+def get_norm_locations():
+    level = "normal"  # Hardcoded level
+    locations = Location.query.filter_by(level=level).all()
+
+    #locations = Location.query.all()
+    norm_locations_list = [{"lat": loc.lat, "lng": loc.lng, "city": loc.city} for loc in locations]
+    return jsonify(norm_locations_list)
 
 if __name__ == '__main__':
     app.run(debug=True)

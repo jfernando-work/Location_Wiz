@@ -1,7 +1,7 @@
 
 let locations = [];
 
-fetch('/locations')
+fetch('/normal_locations')
     .then(response => response.json())
     .then(data => {
         locations = data;
