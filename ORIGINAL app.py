@@ -28,13 +28,6 @@ maps_api_key = os.environ.get("MAPS_API_KEY", "")
 if not maps_api_key:
     print("Warning: MAPS_API_KEY is not set.")
 
-class Location(db.Model):
-    __tablename__ = 'locations'
-    id = db.Column(db.Integer, primary_key=True)
-    latitude = db.Column(db.Float, nullable=False)
-    longitude = db.Column(db.Float, nullable=False)
-    city = db.Column(db.String(255), nullable=False)
-
 class users(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -45,14 +38,6 @@ with app.app_context():
     db.create_all()
     db.session.commit()
 
-@app.route('/locations', methods=['GET'])
-def get_locations():
-    locations = Location.query.all()
-    locations_list = [{"lat": loc.latitude, "lng": loc.longitude, "city": loc.city} for loc in locations]
-    return jsonify(locations_list)
-
-if __name__ == '__main__':
-    app.run(debug=True)
 
 @app.route("/", methods=["GET", "POST"])
 @login_required

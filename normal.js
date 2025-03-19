@@ -1,42 +1,18 @@
 
-const { Client } = require('pg');
+let locations = [];
 
-const client = new Client({
-  user: 'mapgame_wif2_user',
-  host: 'dpg-cv56u1btq21c73f1v2f0-a.ohio-postgres.render.com',
-  database: 'mapgame_wif2',
-  password: process.env.LOCATION_KEY,
-  port: 5432, // Default PostgreSQL port
-});
+fetch('/locations')
+    .then(response => response.json())
+    .then(data => {
+        locations = data;
+        // Now you can use the locations array as before
+        curLocation = locations[Math.floor(Math.random() * locations.length)];
+        curCoordinates = curLocation;
+        curCity = curLocation.city;
+        initialize(); // Initialize Street View after data is loaded
+    })
+    .catch(error => console.error('Error fetching locations:', error));
 
-//client.connect();
-
-client.connect()
-  .then(() => console.log('✅ Connected to PostgreSQL successfully!'))
-  .catch(err => console.error('❌ Connection error:', err.stack))
-  .finally(() => client.end()); // Close connection after test
-
-async function fetchData() {
-  try {
-    const result = await client.query('SELECT lat, lng, city FROM locations'); // Modify as needed
-    const dataArray = result.rows; // Extract data as an array of objects
-    console.log(dataArray);
-    return dataArray;
-  } catch (err) {
-    console.error('Error executing query', err);
-  } 
-}
-process.on("exit", () => client.end()); // Close only on exit
-
-// Call the function
-dataArray = fetchData();
-
-const locations = dataArray;
-curLocation = locations[Math.floor(Math.random()*(locations.length))]
-
-// Extract lat, lng, and city
-const curCoordinates = { lat: curLocation.lat, lng: curLocation.lng };
-const curCity = curLocation.city;
 
 let score = 0;
 var failCounter = 0;
@@ -109,6 +85,8 @@ function guesscity() {
   }
 
 function initialize() {
+
+  if (locations.length === 0) return; // Ensure locations are loaded before initializing Street View
 
     const panorama = new google.maps.StreetViewPanorama(
         document.getElementById("pano"),
