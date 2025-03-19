@@ -47,8 +47,8 @@ with app.app_context():
     db.session.commit()
 
 @app.route('/normal_locations', methods=['GET'])
-def get_norm_locations():
-    level = "normal"  # Hardcoded level
+def get_normal_locations():
+    level = "Normal"  # Hardcoded level
     locations = Location.query.filter_by(level=level).all()
 
     #locations = Location.query.all()
