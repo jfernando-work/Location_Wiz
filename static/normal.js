@@ -41,26 +41,26 @@ function closeModal() {
   modal.style.display = "none";
 }
 
-function increaseScore(event) {
+function increaseScore() {
   score = 100;
   document.getElementById("scoretext").value = score;
   document.getElementById("gameform").submit();
   event.preventDefault()
 }
 
-function decreaseScore(event) {
+function decreaseScore() {
   score = -50;
   document.getElementById("scoretext").value = score;
   document.getElementById("gameform").submit();
   event.preventDefault()
 }
 
-function resetForm(event) {
+function resetForm() {
   document.getElementById("guess").value = "";
   event.preventDefault()
 }
 
-function guesscity(event) {
+function guesscity() {
   guess = document.getElementById("guess").value;
   closeModalButton = document.getElementById("closeModal");
 
