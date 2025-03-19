@@ -18,7 +18,7 @@ fetch('/normal_locations')
         // Now you can use the locations array as before
         curLocation = remainingCities[Math.floor(Math.random() * remainingCities.length)];
         usedCities.add(curLocation.id);
-        curCoordinates = { lat: curLocation.latitude, lng: curLocation.longitude };
+        curCoordinates = { lat: curLocation.lat, lng: curLocation.lng };
         curCity = curLocation.city;
         initialize(); // Initialize Street View after data is loaded
     })
