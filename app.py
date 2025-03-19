@@ -31,8 +31,8 @@ if not maps_api_key:
 class Location(db.Model):
     __tablename__ = 'locations'
     id = db.Column(db.Integer, primary_key=True)
-    lat = db.Column(db.Float, nullable=False)
-    lng = db.Column(db.Float, nullable=False)
+    lat = db.Column(db.Double, nullable=False)
+    lng = db.Column(db.Double, nullable=False)
     city = db.Column(db.String(255), nullable=False)
 
 class users(db.Model):
