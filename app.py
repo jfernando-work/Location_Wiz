@@ -1,22 +1,26 @@
+#necessary imports
 import os
-from flask import Flask, flash, redirect, render_template, request, session, jsonify
+from flask import Flask, redirect, render_template, request, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from helpers import login_required
 
+#initialize flask app
 app = Flask(__name__)
 
+#configure db connection
 db_url = os.getenv("DATABASE_URL")
 if db_url:
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url.replace("postgres://", "postgresql://", 1)
 else:
     raise ValueError("DATABASE_URL is not set")
 
+#configure SQLAlchemy
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 db = SQLAlchemy(app)
 
+#configure flask session
 app.config["SESSION_TYPE"] = "sqlalchemy"
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_SQLALCHEMY"] = db
@@ -24,10 +28,12 @@ app.config["SESSION_SQLALCHEMY_TABLE"] = "sessions"
 
 Session(app)
 
+#grabbing Google API key
 maps_api_key = os.environ.get("MAPS_API_KEY", "")
 if not maps_api_key:
     print("Warning: MAPS_API_KEY is not set.")
 
+#define db models for Location and users
 class Location(db.Model):
     __tablename__ = 'locations'
     id = db.Column(db.Integer, primary_key=True)
@@ -42,40 +48,36 @@ class users(db.Model):
     hashcode = db.Column(db.String(255), nullable=False)
     score = db.Column(db.Integer, default=0)
 
+#create db tables
 with app.app_context():
     db.create_all()
     db.session.commit()
 
+#route for Normal Locations in the game
 @app.route('/normal_locations', methods=['GET'])
 def get_normal_locations():
     level = "Normal"  # Hardcoded level
     locations = Location.query.filter_by(level=level).all()
 
-    #locations = Location.query.all()
     norm_locations_list = [{"lat": loc.lat, "lng": loc.lng, "city": loc.city} for loc in locations]
     return jsonify(norm_locations_list)
 
 if __name__ == '__main__':
     app.run(debug=True)
 
+
+#route for the main page
 @app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
-    
     user_id = session["user_id"]
-
     cur_score = users.query.filter_by(id=user_id).first().score or 0
-
-
     username = users.query.filter_by(id=user_id).first().username or "Unknown"
-
-
     topscores = users.query.order_by(users.score.desc()).limit(10).all()
-
-
     return render_template("index.html", username=username, score=cur_score, topscores=topscores)
 
 
+#route for registering new users
 @app.route("/register", methods=["GET", "POST"])
 def register():
     # Forget any user_id
@@ -103,10 +105,8 @@ def register():
             error_msg = "Passwords don't match."
             return render_template("register.html", error=error_msg)
 
-        
         # Query database for username
         existing_user = users.query.filter_by(username=username).first()
-
 
         # Ensure username exists and password is correct
         if existing_user:
@@ -118,17 +118,16 @@ def register():
         db.session.commit()
 
         session["user_id"] = new_user.id
-
         db.session.commit()
 
         # Remember which user has logged in
         session["user_id"] = new_user.id
-       
 
         # Redirect user to home page
         return redirect("/")
 
 
+#route for user login
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """Log user in"""
@@ -170,6 +169,7 @@ def login():
         return render_template("login.html")
 
 
+#route for user logout
 @app.route("/logout")
 def logout():
     """Log user out"""
@@ -181,14 +181,13 @@ def logout():
     return redirect("/")
 
 
+#route for Normal Level of the game
 @app.route("/normal", methods=["GET", "POST"])
 @login_required
 def normal():
 
     user_id = session["user_id"]
-    
     cur_score = users.query.filter_by(id=user_id).first().score or 0
-
     username = users.query.filter_by(id=user_id).first().username or "Unknown"
 
     if request.method == "GET":
@@ -201,7 +200,6 @@ def normal():
             return render_template("normal.html", username=username, score=cur_score, error="Invalid score input.")
         
         score = max(0, cur_score + new_score)
-
         
         user = users.query.filter_by(id=user_id).first()
         if user:
@@ -211,16 +209,14 @@ def normal():
     return render_template("normal.html", username=username, score=score, maps_api_key=maps_api_key)
 
 
+#route for Difficult Level of the ame
 @app.route("/difficult", methods=["GET", "POST"])
 @login_required
 def difficult():
 
     user_id = session["user_id"]
-    
     cur_score = users.query.filter_by(id=user_id).first().score or 0
-
     username = users.query.filter_by(id=user_id).first().username or "Unknown"
-
 
     if request.method == "GET":
         return render_template("difficult.html", username=username, score=cur_score, maps_api_key=maps_api_key)
@@ -232,7 +228,6 @@ def difficult():
             return render_template("difficult.html", username=username, score=cur_score, error="Invalid score input.")
         
         score = max(0, cur_score + new_score)
-
         
         user = users.query.filter_by(id=user_id).first()
         if user:
