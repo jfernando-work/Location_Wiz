@@ -61,8 +61,8 @@ function resetForm(event) {
 function guesscity(event) {
   
   let guess = document.getElementById("guess").value;
-  let modalContent = document.getElementById("modalContent");
-  let closeModalButton = document.getElementById("closeModal");
+  //let modalContent = document.getElementById("modalContent");
+  closeModalButton = document.getElementById("closeModal");
 
   if (guess.toLowerCase() == curCity.toLowerCase()) {
       modalContent.textContent = "Correct!";
