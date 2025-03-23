@@ -56,11 +56,24 @@ with app.app_context():
 #route for Normal Locations in the game
 @app.route('/normal_locations', methods=['GET'])
 def get_normal_locations():
-    level = "Normal"  # Hardcoded level
+    level = "Normal"  
     locations = Location.query.filter_by(level=level).all()
 
     norm_locations_list = [{"lat": loc.lat, "lng": loc.lng, "city": loc.city} for loc in locations]
     return jsonify(norm_locations_list)
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+#route for Difficult Locations in the game
+@app.route('/difficult_locations', methods=['GET'])
+def get_difficult_locations():
+    level = "Difficult"  
+    locations = Location.query.filter_by(level=level).all()
+
+    diff_locations_list = [{"lat": loc.lat, "lng": loc.lng, "city": loc.city} for loc in locations]
+    return jsonify(diff_locations_list)
 
 if __name__ == '__main__':
     app.run(debug=True)
