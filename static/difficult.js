@@ -54,12 +54,11 @@ function decreaseScore() {
 }
 
 function resetForm(event) {
-  event?.preventDefault()
   document.getElementById("guess").value = "";
+  event.preventDefault()
 }
 
 function guesscity(event) {
-  event.preventDefault();
 
   let guess = document.getElementById("guess").value;
   let modalContent = document.getElementById("modalContent");
@@ -94,6 +93,7 @@ function guesscity(event) {
         });
       }
     }
+    event.preventDefault();
   }
 
 function initialize() {
