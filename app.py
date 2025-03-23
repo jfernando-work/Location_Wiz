@@ -9,7 +9,7 @@ from helpers import login_required
 #initialize flask app
 app = Flask(__name__)
 
-#configure db connection
+#configure database connection
 db_url = os.getenv("DATABASE_URL")
 if db_url:
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url.replace("postgres://", "postgresql://", 1)
@@ -93,7 +93,7 @@ def index():
 #route for registering new users
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    # Forget any user_id
+    #forget any user_id
     session.clear()
 
     if request.method == "GET":
@@ -118,10 +118,10 @@ def register():
             error_msg = "Passwords don't match."
             return render_template("register.html", error=error_msg)
 
-        # Query database for username
+        #query database for username
         existing_user = users.query.filter_by(username=username).first()
 
-        # Ensure username exists and password is correct
+        #make sure username exists and password is correct
         if existing_user:
             error_msg = "User already exists."
             return render_template("register.html", error=error_msg)
@@ -133,10 +133,10 @@ def register():
         session["user_id"] = new_user.id
         db.session.commit()
 
-        # Remember which user has logged in
+        #remember which user has logged in
         session["user_id"] = new_user.id
 
-        # Redirect user to home page
+        #redirect user to home page
         return redirect("/")
 
 
@@ -145,39 +145,39 @@ def register():
 def login():
     """Log user in"""
 
-    # Forget any user_id
+    #forget any user_id
     session.clear()
 
-    # User reached route via POST (as by submitting a form via POST)
+    #user reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
 
-        # Ensure username was submitted
+        #make sure username was submitted
         if not username:
             error_msg = "Enter a valid username."
             return render_template("login.html", error=error_msg)
 
-        # Ensure password was submitted
+        #ensure password was submitted
         elif not password:
             error_msg = "Enter a valid password."
             return render_template("login.html", error=error_msg)
 
-        # Query database for user
+        #query database for user
         existing_user = users.query.filter_by(username=username).first()
 
 
-        # Ensure user exists and password is correct
+        #ensure user exists and password is correct
         if not existing_user or not check_password_hash(existing_user.hashcode, password):
             return render_template("login.html", error="Incorrect username or password.")
 
-        # Remember which user has logged in
+        #remember which user has logged in
         session["user_id"] = existing_user.id
 
-        # Redirect to homepage
+        #redirect to homepage
         return redirect("/")
 
-    # User reached route via GET (as by clicking a link or via redirect)
+    #user reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("login.html")
 
@@ -187,10 +187,10 @@ def login():
 def logout():
     """Log user out"""
 
-    # Forget any user_id
+    #forget any user_id
     session.clear()
 
-    # Redirect user to login form
+    #redirect user to login form
     return redirect("/")
 
 
@@ -222,7 +222,7 @@ def normal():
     return render_template("normal.html", username=username, score=score, maps_api_key=maps_api_key)
 
 
-#route for Difficult Level of the ame
+#route for Difficult Level of the game
 @app.route("/difficult", methods=["GET", "POST"])
 @login_required
 def difficult():
