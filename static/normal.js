@@ -43,14 +43,14 @@ function increaseScore() {
   score = 100;
   document.getElementById("scoretext").value = score;
   document.getElementById("gameform").submit();
-  // event.preventDefault()
+  event.preventDefault()
 }
 
 function decreaseScore() {
   score = -50;
   document.getElementById("scoretext").value = score;
   document.getElementById("gameform").submit();
-  // event.preventDefault()
+  event.preventDefault()
 }
 
 function resetForm(event) {
