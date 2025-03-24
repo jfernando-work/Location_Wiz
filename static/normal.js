@@ -25,7 +25,7 @@ fetch('/normal_locations')
     .catch(error => console.error('Error fetching locations:', error));
 
 let score = 0;
-let failCounter = 0;
+var failCounter = 0;
 
 function openModal() {
   var closeButton = document.getElementById("closeModal");
@@ -53,12 +53,12 @@ function decreaseScore() {
   event.preventDefault()
 }
 
-function resetForm(event) {
+function resetForm() {
   document.getElementById("guess").value = "";
   event.preventDefault()
 }
 
-function guesscity(event) {
+function guesscity() {
   
   let guess = document.getElementById("guess").value;
   //let modalContent = document.getElementById("modalContent");
