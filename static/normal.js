@@ -83,7 +83,7 @@ function guesscity() {
         });
       }
       else {
-        modalContent.textContent = "Sorry, you lose 50 points.";
+        modalContent.textContent = "Sorry, the correct answer was ${curCity}. You lose 50 points.";
         openModal();
 
         closeModalButton.addEventListener('click', () => {
