@@ -1,6 +1,6 @@
 # 🌍 LocationWiz – Street View Challenge
 
-**Guess the Location** is a fun and educational web-based game that uses **Google Maps Street View** to test your geography skills. Explore real locations around the world and see if you can guess where you are!
+**LocationWiz** is a fun and educational web-based game that uses **Google Maps Street View** to test your geography skills. Explore real locations around the world and see if you can guess where you are!
 
 ---
 
