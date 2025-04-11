@@ -1,6 +1,6 @@
 # 🌍 Location Wiz – Google Street View Challenge
 
-Location Wiz is a fun and educational online game that uses Google Streetview to test your geography skills. Explore locations around the world and see if you can guess where you are!
+Location Wiz is a fun and educational online game that uses Google Street View to test your geography skills. Explore locations around the world and see if you can guess where you are!
 
 ---
 
